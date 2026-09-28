@@ -14,6 +14,17 @@
     a.href = waLink(a.getAttribute('data-proc'));
     a.target = '_blank';
     a.rel = 'noopener';
+    // Evento para o GTM: qual procedimento e em que parte da página foi o clique
+    a.addEventListener('click', function () {
+      var secao = a.closest('section[id], header, footer');
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'clique_whatsapp',
+        procedimento: a.getAttribute('data-proc') || 'Avaliação geral',
+        posicao_botao: a.classList.contains('wa-float') ? 'botao-flutuante'
+          : secao ? (secao.id || secao.tagName.toLowerCase()) : 'pagina'
+      });
+    });
   });
 
   // Menu mobile
