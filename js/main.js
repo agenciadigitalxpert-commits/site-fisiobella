@@ -4,7 +4,7 @@
 
   // Opcional: URL que recebe os dados do formulário (ex.: Google Apps Script ligado a uma planilha).
   // Vazio = os dados só seguem na mensagem do WhatsApp.
-  var LEAD_ENDPOINT = '';
+  var LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx3HnZAxrcwPKhgZTg60bAiDLmEjN_STTuSrYuVbQ3yN5zXT5dCYkkdn0Gfx-TxpRu6BQ/exec';
 
   function waLink(proc, nome) {
     var ola = nome ? 'Olá! Meu nome é ' + nome + '. ' : 'Olá! ';
