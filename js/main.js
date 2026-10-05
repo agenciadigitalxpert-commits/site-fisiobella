@@ -14,8 +14,16 @@
     a.href = waLink(a.getAttribute('data-proc'));
     a.target = '_blank';
     a.rel = 'noopener';
-    // Evento para o GTM: qual procedimento e em que parte da página foi o clique
+    // Evento para o GTM: qual procedimento e em que parte da página foi o clique.
+    // Conta no máximo uma vez por visita, para cliques repetidos não inflarem as conversões.
     a.addEventListener('click', function () {
+      try {
+        if (sessionStorage.getItem('fb_wa_click')) return;
+        sessionStorage.setItem('fb_wa_click', '1');
+      } catch (e) {
+        if (window.__fbWaClick) return;
+        window.__fbWaClick = true;
+      }
       var secao = a.closest('section[id], header, footer');
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
