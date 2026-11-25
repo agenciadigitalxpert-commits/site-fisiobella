@@ -216,6 +216,7 @@ em { font-style: italic; color: var(--rose); }
 .lead-submit { width: 100%; margin-top: 2px; }
 .lead-privacy { font-size: .74rem; color: var(--muted); text-align: center; margin: 0; }
 body.lead-open { overflow: hidden; }
+.lead-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
 /* Reveal */
 [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }

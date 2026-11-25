@@ -6,6 +6,30 @@
   // Vazio = os dados só seguem na mensagem do WhatsApp.
   var LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx3HnZAxrcwPKhgZTg60bAiDLmEjN_STTuSrYuVbQ3yN5zXT5dCYkkdn0Gfx-TxpRu6BQ/exec';
 
+  // Rota do próprio site que repassa o lead ao CRM (api/lead.js na Vercel)
+  var CRM_ROUTE = '/api/lead';
+
+  // Origem da visita: guardada ao abrir a página para não se perder se a pessoa navegar antes de preencher
+  var ORIGEM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'gbraid', 'wbraid', 'fbclid'];
+  try {
+    var daUrl = new URLSearchParams(location.search);
+    ORIGEM.forEach(function (k) {
+      var v = daUrl.get(k);
+      if (v) sessionStorage.setItem('fb_' + k, v);
+    });
+  } catch (e) { /* sem sessionStorage: segue sem origem */ }
+
+  function origemVisita() {
+    var o = {};
+    ORIGEM.forEach(function (k) {
+      try {
+        var v = sessionStorage.getItem('fb_' + k);
+        if (v) o[k] = v;
+      } catch (e) { /* ignora */ }
+    });
+    return o;
+  }
+
   function waLink(proc, nome) {
     var ola = nome ? 'Olá! Meu nome é ' + nome + '. ' : 'Olá! ';
     var msg = proc && proc !== 'Avaliação geral'
@@ -123,6 +147,21 @@
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event: 'clique_whatsapp', procedimento: proc, posicao_botao: posicaoBotao(origem) });
     }
+
+    // Lead para o CRM: não espera resposta, o WhatsApp abre na hora mesmo se o CRM falhar
+    var lead = origemVisita();
+    lead.nome = nome;
+    lead.whatsapp = tel;
+    lead.interesse = proc;
+    lead.empresa = form.elements.empresa ? form.elements.empresa.value : '';
+    try {
+      fetch(CRM_ROUTE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lead),
+        keepalive: true
+      }).catch(function () { /* não impede o WhatsApp */ });
+    } catch (err) { /* navegador antigo: segue para o WhatsApp */ }
 
     if (LEAD_ENDPOINT && navigator.sendBeacon) {
       try {
